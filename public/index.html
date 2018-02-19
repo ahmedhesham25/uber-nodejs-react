@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Uber | HomePage</title>
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet" />﻿
+    <link rel="stylesheet" href="styles.css" type="text/css">
+  </head>
+  <body>
+    <h1 class="title">Uber - JS</h1>
+
+    <div id="homepage">
+      <h1> Pick The Nearest Driver To Your Area </h1>
+      <div id="users"></div>
+    </div>
+    <!-- Babel and React and React-Dom CDN -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/react@15/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>﻿
+
+    <!-- Create React Component -->
+    <script type="text/babel">
+    var Users = React.createClass({
+        getInitialState: function(){
+          return ({
+            users: []
+          });
+        },
+        render: function(){
+          var users = this.state.users;
+
+          return(
+            <div id="user-container">
+              <form id="search" onSubmit= { this.handleSubmit }>
+                  <label> Enter Your Latitude: </label>
+                  <input type="text" ref="lat" placeholder="latitude" required />
+                  <label> Enter Your Langitude: </label>
+                  <input type="text" ref="lng" placeholder="langitude" required />
+                  <input type="submit" value="Find a driver" />
+              </form>
+              <ul> {users} </ul>
+            </div>
+          );
+        },
+        handleSubmit: function(e){
+          e.preventDefault();
+          var lng = this.refs.lng.value;
+          var lat = this.refs.lat.value;
+          fetch('/api/users?lng='+ lng + '&lat=' + lat).then(function(data){
+            return data.json();
+          }).then( data => {
+            let users = data.map(function(user, index)
+            {
+                return (
+                  <li key={index}>
+                    <span className={user.obj.available}></span>
+                    <span className="name"> {user.obj.name} </span>
+                    <span className="age"> {user.obj.age} </span>
+                    <span className="dist"> {Math.floor(user.dis/1000)} km </span>
+                  </li>
+                );
+            });
+            this.setState({
+              users: users
+            });
+            console.log(users);
+        }).catch(err => {
+            console.log(err);
+        });
+      }
+    });
+    ReactDOM.render(<Users />, document.getElementById("users"));
+
+    </script>
+  </body>
+</html>
